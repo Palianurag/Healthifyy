@@ -27,22 +27,20 @@ llm = ChatGroq(groq_api_key=groq_api_key, model_name="llama-3.3-70b-versatile")
 # Serialize doctor database as JSON for context
 doctor_context = json.dumps(data.doctors_db, indent=2)
 
-# Build a ChatPromptTemplate that includes:
-# 1) System message with doctor DB
-# 2) System message with instructions
-# 3) User message placeholder
+# Build a ChatPromptTemplate
 prompt = ChatPromptTemplate.from_messages([
     SystemMessage(content=(
         "You are an expert medical professional with extensive knowledge of diseases, symptoms, and treatments. "
-        "You have access to the following doctor database (do not expose the raw list unless specifically asked):\n" + doctor_context
+        "You have access to the following doctor database (do not expose the raw list unless specifically asked):\n" 
+        + doctor_context
     )),
     SystemMessage(content=(
-        "When a user describes symptoms, use the doctor database to suggest appropriate specialists by name, hospital, and location with appropriate medicine  "
+        "When a user describes symptoms, use the doctor database to suggest appropriate specialists by name, hospital, and location with appropriate medicine. "
         "Also analyze the symptoms and provide possible conditions, recommended treatments, and self-care advice. "
         "If symptoms suggest an emergency, advise the user to seek immediate professional help. "
-        "Always respond clearly and concisely in English."
-        "suggest user medicines for the disease"
-        "suggest the user various precautions"
+        "Always respond clearly and concisely in English. "
+        "Suggest medicines for the disease. "
+        "Suggest precautions."
     )),
     ("user", "{query}")
 ])
@@ -64,7 +62,6 @@ def chat():
 
         print(f"Received query: {query}")
 
-        # Combine prompt and LLM
         chain = prompt | llm
         response = chain.invoke({"query": query})
 
@@ -83,7 +80,5 @@ def health_check():
 
 if __name__ == "__main__":
     print("Starting Flask server...")
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
